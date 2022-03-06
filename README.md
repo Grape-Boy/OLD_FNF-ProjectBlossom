@@ -1,3 +1,6 @@
+# Friday Night Funkin' - Project Blossom
+Engine originally used on the [VS Cheeky](https://gamebanana.com/mods/297664) mod directed by [WIZORD](https://www.youtube.com/c/WIZORD_magic_man/featured) and co-directed by [Lexicord](https://www.youtube.com/channel/UCa6BbzPZKLbT8kbVg4Z9f7g). It was made on Kade Engine but I'm using [Psych Engine](https://github.com/ShadowMario/FNF-PsychEngine) because :grin:
+
 # Friday Night Funkin' - Psych Engine
 Engine originally used on [Mind Games Mod](https://gamebanana.com/mods/301107), intended to be a fix for the vanilla version's many issues while keeping the casual play aspect of it. Also aiming to be an easier alternative to newbie coders.
 

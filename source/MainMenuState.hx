@@ -46,10 +46,23 @@ class MainMenuState extends MusicBeatState
 		'options',
 	];
 
-	var magenta:FlxSprite;
+	var optionColors:Array<Int> = [
+		0xFF9664f5,
+		0xFFff4b4b,
+		#if MODS_ALLOWED 0xFFff96d7, #end
+		#if ACHIEVEMENTS_ALLOWED 0xFF964bff, #end
+		0xFFfffb7d,
+		0xFF4bff73,
+		#if !switch 0xFFffd732, #end
+		0xFF96ffff,
+	];
+
+	//var magenta:FlxSprite;
 	var camFollow:FlxObject;
 	var camFollowPos:FlxObject;
 	var debugKeys:Array<FlxKey>;
+
+	var bg:FlxSprite;
 	
 	override function create()
 	{
@@ -74,20 +87,30 @@ class MainMenuState extends MusicBeatState
 
 		persistentUpdate = persistentDraw = true;
 
-		var yScroll:Float = Math.max(0.25 - (0.05 * (optionShit.length - 4)), 0.1);
-		var bg:FlxSprite = new FlxSprite(-80).loadGraphic(Paths.image('menuBG'));
-		bg.scrollFactor.set(0, yScroll);
+		//var yScroll:Float = Math.max(0.25 - (0.05 * (optionShit.length - 4)), 0.1); = useless :((
+		bg = new FlxSprite(-80).loadGraphic(Paths.image('menuDesat'));
+		bg.scrollFactor.set(0, 0); // no scrolling!! also i think it defaults to 0 anyway but whatever this is how it is rn
 		bg.setGraphicSize(Std.int(bg.width * 1.175));
 		bg.updateHitbox();
 		bg.screenCenter();
 		bg.antialiasing = ClientPrefs.globalAntialiasing;
+		bg.color = 0xFF4b4b4b;
 		add(bg);
+
+		var outlineCheckers:FlxSprite = new FlxSprite(0, 0).loadGraphic(Paths.image('menucheckers/left_checkers'));
+		outlineCheckers.scrollFactor.set(0, 0);
+		outlineCheckers.updateHitbox();
+		outlineCheckers.screenCenter();
+		outlineCheckers.antialiasing = ClientPrefs.globalAntialiasing;
+
+		add(outlineCheckers);
+
 
 		camFollow = new FlxObject(0, 0, 1, 1);
 		camFollowPos = new FlxObject(0, 0, 1, 1);
 		add(camFollow);
 		add(camFollowPos);
-
+		/*
 		magenta = new FlxSprite(-80).loadGraphic(Paths.image('menuDesat'));
 		magenta.scrollFactor.set(0, yScroll);
 		magenta.setGraphicSize(Std.int(magenta.width * 1.175));
@@ -97,9 +120,8 @@ class MainMenuState extends MusicBeatState
 		magenta.antialiasing = ClientPrefs.globalAntialiasing;
 		magenta.color = 0xFFfd719b;
 		add(magenta);
+		*/
 		
-		// magenta.scrollFactor.set();
-
 		menuItems = new FlxTypedGroup<FlxSprite>();
 		add(menuItems);
 
@@ -114,6 +136,7 @@ class MainMenuState extends MusicBeatState
 			var menuItem:FlxSprite = new FlxSprite(0, (i * 140)  + offset);
 			menuItem.scale.x = scale;
 			menuItem.scale.y = scale;
+			menuItem.y += 150;
 			menuItem.frames = Paths.getSparrowAtlas('mainmenu/menu_' + optionShit[i]);
 			menuItem.animation.addByPrefix('idle', optionShit[i] + " basic", 24);
 			menuItem.animation.addByPrefix('selected', optionShit[i] + " white", 24);
@@ -222,7 +245,7 @@ class MainMenuState extends MusicBeatState
 					selectedSomethin = true;
 					FlxG.sound.play(Paths.sound('confirmMenu'));
 
-					if(ClientPrefs.flashing) FlxFlicker.flicker(magenta, 1.1, 0.15, false); 
+					//if(ClientPrefs.flashing) FlxFlicker.flicker(magenta, 1.1, 0.15, false); 
 
 					menuItems.forEach(function(spr:FlxSprite)
 					{
@@ -286,12 +309,21 @@ class MainMenuState extends MusicBeatState
 
 	function changeItem(huh:Int = 0)
 	{
+		var oldSelected:Int = curSelected;
 		curSelected += huh;
 
 		if (curSelected >= menuItems.length)
 			curSelected = 0;
 		if (curSelected < 0)
 			curSelected = menuItems.length - 1;
+
+		FlxTween.color(
+			bg,
+			0.25,
+			optionColors[oldSelected],
+			optionColors[curSelected],
+			{ ease: FlxEase.sineIn }
+		);
 
 		function resetOtherPositions(ID:Int = 0)
 		{

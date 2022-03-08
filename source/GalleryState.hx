@@ -6,6 +6,7 @@ import Discord.DiscordClient;
 import flash.text.TextField;
 import flixel.FlxG;
 import flixel.FlxSprite;
+import flixel.addons.transition.FlxTransitionableState;
 import flixel.addons.display.FlxGridOverlay;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.math.FlxMath;
@@ -21,10 +22,19 @@ import lime.utils.Assets;
 
 class GalleryState extends MusicBeatState
 {
-    
+    var randomMessages:Array<String> = [
+        'hello mister',
+        'bye mister',
+        'doe',
+        'die*',
+        'intermittent dna testing area for bozos'
+    ];
 
     override function create()
     {
+        transIn = FlxTransitionableState.defaultTransIn;
+		transOut = FlxTransitionableState.defaultTransOut;
+
 		var bg:FlxSprite = new FlxSprite(-80).loadGraphic(Paths.image('menuBG'));
 		bg.scrollFactor.set(0, 0);
 		bg.setGraphicSize(Std.int(bg.width * 1.175));

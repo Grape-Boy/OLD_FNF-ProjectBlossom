@@ -67,6 +67,24 @@ class OptionsState extends MusicBeatState
 		bg.antialiasing = ClientPrefs.globalAntialiasing;
 		add(bg);
 
+
+		var leftCheckers:FlxSprite = new FlxSprite(0, 0).loadGraphic(Paths.image('menucheckers/left_checkers'));
+		leftCheckers.scrollFactor.set(0, 0);
+		leftCheckers.updateHitbox();
+		leftCheckers.screenCenter();
+		leftCheckers.antialiasing = ClientPrefs.globalAntialiasing;
+
+		add(leftCheckers);
+
+		var rightCheckers:FlxSprite = new FlxSprite(0, 0).loadGraphic(Paths.image('menucheckers/right_checkers'));
+		rightCheckers.scrollFactor.set(0, 0);
+		rightCheckers.updateHitbox();
+		rightCheckers.screenCenter();
+		rightCheckers.antialiasing = ClientPrefs.globalAntialiasing;
+
+		add(rightCheckers);
+
+
 		grpOptions = new FlxTypedGroup<Alphabet>();
 		add(grpOptions);
 

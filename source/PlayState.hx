@@ -3609,6 +3609,39 @@ class PlayState extends MusicBeatState
 
 				//more accurate hit time for the ratings? part 2 (Now that the calculations are done, go back to the time it was before for not causing a note stutter)
 				Conductor.songPosition = lastTime;
+			};
+
+			var curSection:Int = Math.floor(curStep / 16);
+			if(SONG.notes[curSection].mustHitSection)
+			{
+
+				var offsetX:Float = 20;
+				var offsetY:Float = 20;
+
+				var camX:Float = boyfriend.cameraPosition[0];
+				var camY:Float = boyfriend.cameraPosition[1];
+
+				var animName:String = boyfriend.animation.curAnim.name;
+				if(animName.startsWith('singLEFT') && !animName.endsWith('miss'))
+				{
+					camFollow.x = boyfriend.x + camX - offsetX;
+					camFollow.y = boyfriend.y + camY;
+				}
+				else if(animName.startsWith('singDOWN') && !animName.endsWith('miss'))
+				{
+					camFollow.x = boyfriend.x + camX;
+					camFollow.y = boyfriend.y + camY + offsetY;
+				}
+				else if(animName.startsWith('singUP') && !animName.endsWith('miss'))
+				{
+					camFollow.x = boyfriend.x + camX;
+					camFollow.y = boyfriend.y + camY - offsetY;
+				}
+				else if(animName.startsWith('singRIGHT') && !animName.endsWith('miss'))
+				{
+					camFollow.x = boyfriend.x + camX + offsetX;
+					camFollow.y = boyfriend.y + camY;
+				}
 			}
 
 			var spr:StrumNote = playerStrums.members[key];

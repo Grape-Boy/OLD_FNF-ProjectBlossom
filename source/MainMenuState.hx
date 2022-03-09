@@ -47,14 +47,14 @@ class MainMenuState extends MusicBeatState
 	];
 
 	var optionColors:Array<Int> = [
-		0xFF9664f5,
-		0xFFff4b4b,
-		#if MODS_ALLOWED 0xFFff96d7, #end
-		#if ACHIEVEMENTS_ALLOWED 0xFF964bff, #end
-		0xFFfffb7d,
-		0xFF4bff73,
-		#if !switch 0xFFffd732, #end
-		0xFF96ffff,
+		0xFF9664F5,
+		0xFFFF4B4B,
+		#if MODS_ALLOWED 0xFF665AFF, #end
+		#if ACHIEVEMENTS_ALLOWED 0xFF964BFF, #end
+		0xFFFFFB7D,
+		0xFF4BFF73,
+		#if !switch 0xFFFFD732, #end
+		0xFF96FFFF,
 	];
 
 	//var magenta:FlxSprite;
@@ -96,6 +96,7 @@ class MainMenuState extends MusicBeatState
 		bg.antialiasing = ClientPrefs.globalAntialiasing;
 		bg.color = 0xFF4b4b4b;
 		add(bg);
+		
 
 		var outlineCheckers:FlxSprite = new FlxSprite(0, 0).loadGraphic(Paths.image('menucheckers/left_checkers'));
 		outlineCheckers.scrollFactor.set(0, 0);
@@ -317,9 +318,13 @@ class MainMenuState extends MusicBeatState
 		if (curSelected < 0)
 			curSelected = menuItems.length - 1;
 
+		var durationTime:Float = 1;
+		if(ClientPrefs.flashing)
+			durationTime = 0.25;
+
 		FlxTween.color(
 			bg,
-			0.25,
+			durationTime,
 			optionColors[oldSelected],
 			optionColors[curSelected],
 			{ ease: FlxEase.sineIn }

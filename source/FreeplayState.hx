@@ -106,6 +106,14 @@ class FreeplayState extends MusicBeatState
 		add(bg);
 		bg.screenCenter();
 
+		var outlineCheckers:FlxSprite = new FlxSprite(0, 0).loadGraphic(Paths.image('menucheckers/left_checkers'));
+		outlineCheckers.scrollFactor.set(0, 0);
+		outlineCheckers.updateHitbox();
+		outlineCheckers.screenCenter();
+		outlineCheckers.antialiasing = ClientPrefs.globalAntialiasing;
+
+		add(outlineCheckers);
+
 		grpSongs = new FlxTypedGroup<Alphabet>();
 		add(grpSongs);
 

@@ -57,12 +57,28 @@ class MainMenuState extends MusicBeatState
 		0xFF96FFFF,
 	];
 
+	var optionPositions:Map<String, Array<Int>> = [
+		'story_mode' => [85, 0],
+		'freeplay' => [65, 0],
+		#if MODS_ALLOWED 'mods' => [20, 0], #end
+		#if ACHIEVEMENTS_ALLOWED 'awards' => [60, 0], #end
+		'gallery' => [0, 0],
+		'credits' => [80, 0],
+		#if !switch 'donate' => [60, 0], #end
+		'options' => [50, 0],
+	];
+
 	//var magenta:FlxSprite;
+	var camZooming:Bool = false;
+	var defaultCamZoom:Float = FlxG.camera.initialZoom;
 	var camFollow:FlxObject;
 	var camFollowPos:FlxObject;
 	var debugKeys:Array<FlxKey>;
 
+	var zoomTween:FlxTween;
+
 	var bg:FlxSprite;
+	var bgColorTween:FlxTween;
 	
 	override function create()
 	{
@@ -74,9 +90,13 @@ class MainMenuState extends MusicBeatState
 		#end
 		debugKeys = ClientPrefs.copyKey(ClientPrefs.keyBinds.get('debug_1'));
 
+		var initialCamZoom:Float = defaultCamZoom + 0.5;
+
 		camGame = new FlxCamera();
 		camAchievement = new FlxCamera();
 		camAchievement.bgColor.alpha = 0;
+
+		FlxG.camera.zoom = initialCamZoom;
 
 		FlxG.cameras.reset(camGame);
 		FlxG.cameras.add(camAchievement);
@@ -89,7 +109,7 @@ class MainMenuState extends MusicBeatState
 
 		//var yScroll:Float = Math.max(0.25 - (0.05 * (optionShit.length - 4)), 0.1); = useless :((
 		bg = new FlxSprite(-80).loadGraphic(Paths.image('menuDesat'));
-		bg.scrollFactor.set(0, 0); // no scrolling!! also i think it defaults to 0 anyway but whatever this is how it is rn
+		bg.scrollFactor.set(0, 0); // no scrolling!! also i DONT think it defaults to 0, 0 !!
 		bg.setGraphicSize(Std.int(bg.width * 1.175));
 		bg.updateHitbox();
 		bg.screenCenter();
@@ -97,18 +117,40 @@ class MainMenuState extends MusicBeatState
 		bg.color = 0xFF4b4b4b;
 		add(bg);
 		
+		// idk what this means but it makes graphics
+		var darkArea = new FlxSprite();
+		darkArea.makeGraphic(200, 2000, FlxColor.BLACK);
+		darkArea.x = -100;
+		darkArea.scrollFactor.set(0, 0);
+		darkArea.updateHitbox();
+		add(darkArea);
 
 		var outlineCheckers:FlxSprite = new FlxSprite(0, 0).loadGraphic(Paths.image('menucheckers/left_checkers'));
 		outlineCheckers.scrollFactor.set(0, 0);
-		outlineCheckers.updateHitbox();
-		outlineCheckers.screenCenter();
+		//outlineCheckers.screenCenter(Y);
+		outlineCheckers.x -= 500;
 		outlineCheckers.antialiasing = ClientPrefs.globalAntialiasing;
+		outlineCheckers.updateHitbox();
 
 		add(outlineCheckers);
 
+		FlxTween.tween(
+			outlineCheckers,
+			{ x: 0},
+			0.5,
+			{ ease: FlxEase.backOut}
+		);
+		
+		FlxTween.tween(
+			FlxG.camera,
+			{zoom: defaultCamZoom},
+			1,
+			{ ease: FlxEase.sineIn}
+		);
 
 		camFollow = new FlxObject(0, 0, 1, 1);
 		camFollowPos = new FlxObject(0, 0, 1, 1);
+
 		add(camFollow);
 		add(camFollowPos);
 		/*
@@ -135,20 +177,30 @@ class MainMenuState extends MusicBeatState
 		{
 			var offset:Float = 108 - (Math.max(optionShit.length, 4) - 4) * 80;
 			var menuItem:FlxSprite = new FlxSprite(0, (i * 140)  + offset);
+
 			menuItem.scale.x = scale;
 			menuItem.scale.y = scale;
+
+			menuItem.x -= 250;
 			menuItem.y += 150;
+
+			menuItem.alpha = 0;
+
 			menuItem.frames = Paths.getSparrowAtlas('mainmenu/menu_' + optionShit[i]);
+
+			menuItem.antialiasing = ClientPrefs.globalAntialiasing;
+
 			menuItem.animation.addByPrefix('idle', optionShit[i] + " basic", 24);
 			menuItem.animation.addByPrefix('selected', optionShit[i] + " white", 24);
 			menuItem.animation.play('idle');
+
 			menuItem.ID = i;
-			//menuItem.screenCenter(X);
+
 			menuItems.add(menuItem);
+
 			var scr:Float = (optionShit.length - 4) * 0.135;
 			if(optionShit.length < 6) scr = 0;
 			menuItem.scrollFactor.set(0, scr);
-			menuItem.antialiasing = ClientPrefs.globalAntialiasing;
 			//menuItem.setGraphicSize(Std.int(menuItem.width * 0.58));
 			add(menuItem);
 
@@ -159,6 +211,23 @@ class MainMenuState extends MusicBeatState
 				galleryY = menuItem.y;
 			};
 			
+			if(curSelected == i)
+			{
+				FlxTween.tween(
+					menuItem,
+					{ x: optionPositions[optionShit[i]][0]}, // hard
+					2,
+					{ ease: FlxEase.backOut}
+				);
+			}
+
+			FlxTween.tween(
+				menuItem,
+				{ alpha: 1},
+				1.5,
+				{ ease: FlxEase.sineOut}
+			);
+
 			menuItem.updateHitbox();
 		}
 
@@ -230,6 +299,8 @@ class MainMenuState extends MusicBeatState
 
 			if (controls.BACK)
 			{
+				if(zoomTween != null) zoomTween.cancel();
+
 				selectedSomethin = true;
 				FlxG.sound.play(Paths.sound('cancelMenu'));
 				MusicBeatState.switchState(new TitleState());
@@ -243,10 +314,19 @@ class MainMenuState extends MusicBeatState
 				}
 				else
 				{
+					if(ClientPrefs.camZooms) {
+						FlxG.camera.zoom += 0.15;
+
+						zoomTween = FlxTween.tween(
+							FlxG.camera,
+							{zoom: defaultCamZoom},
+							1,
+							{ ease: FlxEase.sineOut}
+						);
+					}
+
 					selectedSomethin = true;
 					FlxG.sound.play(Paths.sound('confirmMenu'));
-
-					//if(ClientPrefs.flashing) FlxFlicker.flicker(magenta, 1.1, 0.15, false); 
 
 					menuItems.forEach(function(spr:FlxSprite)
 					{
@@ -310,7 +390,15 @@ class MainMenuState extends MusicBeatState
 
 	function changeItem(huh:Int = 0)
 	{
-		var oldSelected:Int = curSelected;
+		if(ClientPrefs.camZooms) {
+			FlxG.camera.zoom += 0.05;
+
+			if(!camZooming) { 
+				zoomTween = FlxTween.tween(FlxG.camera, {zoom: defaultCamZoom}, 0.125);
+			};
+		};
+
+		//var oldSelected:Int = curSelected;
 		curSelected += huh;
 
 		if (curSelected >= menuItems.length)
@@ -322,10 +410,14 @@ class MainMenuState extends MusicBeatState
 		if(ClientPrefs.flashing)
 			durationTime = 0.25;
 
-		FlxTween.color(
+
+		if(bgColorTween != null)
+			bgColorTween.cancel();
+
+		bgColorTween = FlxTween.color(
 			bg,
 			durationTime,
-			optionColors[oldSelected],
+			bg.color,
 			optionColors[curSelected],
 			{ ease: FlxEase.sineIn }
 		);
@@ -350,6 +442,11 @@ class MainMenuState extends MusicBeatState
 			{
 				spr.animation.play('selected');
 
+				var i:Int = spr.ID;
+				spr.x = optionPositions[optionShit[i]][0]; // complex coding!
+				resetOtherPositions(spr.ID);
+
+				/*
 				switch (optionShit[spr.ID]) {
 					case 'story_mode':
 						spr.x = 85;
@@ -376,6 +473,7 @@ class MainMenuState extends MusicBeatState
 						spr.x = 50;
 						resetOtherPositions(spr.ID);
 				};
+				*/
 
 				var add:Float = 0;
 				if(menuItems.length > 4) {

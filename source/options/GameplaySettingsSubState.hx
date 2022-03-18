@@ -34,7 +34,7 @@ class GameplaySettingsSubState extends BaseOptionsMenu
 		title = 'Gameplay Settings';
 		rpcTitle = 'Gameplay Settings Menu'; //for Discord Rich Presence
 
-		var option:Option = new Option('Controller Mode',
+		var option:Option = new Option('Controller Mode', //		Controller Mode
 			'Check this if you want to play with\na controller instead of using your Keyboard.',
 			'controllerMode',
 			'bool',
@@ -42,36 +42,43 @@ class GameplaySettingsSubState extends BaseOptionsMenu
 		addOption(option);
 
 		//I'd suggest using "Downscroll" as an example for making your own option since it is the simplest here
-		var option:Option = new Option('Downscroll', //Name
+		var option:Option = new Option('Downscroll', //Name		Downscroll
 			'If checked, notes go Down instead of Up, simple enough.', //Description
 			'downScroll', //Save data variable name
 			'bool', //Variable type
 			false); //Default value
 		addOption(option);
 
-		var option:Option = new Option('Middlescroll',
+		var option:Option = new Option('Middlescroll', //		Middlescroll
 			'If checked, your notes get centered.',
 			'middleScroll',
 			'bool',
 			false);
 		addOption(option);
 
-		var option:Option = new Option('Ghost Tapping',
+		var option:Option = new Option('Ghost Tapping',//		Ghost Tapping
 			"If checked, you won't get misses from pressing keys\nwhile there are no notes able to be hit.",
 			'ghostTapping',
 			'bool',
 			true);
 		addOption(option);
 
-		var option:Option = new Option('Disable Reset Button',
+		var option:Option = new Option('Disable Reset Button', //		Disable Reset Button
 			"If checked, pressing Reset won't do anything.",
 			'noReset',
 			'bool',
 			false);
 		addOption(option);
 
-		var option:Option = new Option('Hitsound Volume',
-			'Funny notes does \"Tick!\" when you hit them."',
+		var option:Option = new Option('Disable Lua Scripts', //		Disable Lua Scripts
+			"If checked, Lua scripts will be disabled while playing.\n(This does NOT disable *stage scripts*)",
+			'scriptsDisabled',
+			'bool',
+			false);
+		addOption(option);
+
+		var option:Option = new Option('Hitsound Volume', //		Hitsound Volume
+			'Funny notes does \"Tick!\" when you hit them.',
 			'hitsoundVolume',
 			'percent',
 			0);
@@ -82,7 +89,7 @@ class GameplaySettingsSubState extends BaseOptionsMenu
 		option.changeValue = 0.1;
 		option.decimals = 1;
 
-		var option:Option = new Option('Rating Offset',
+		var option:Option = new Option('Rating Offset', //		Rating Offset
 			'Changes how late/early you have to hit for a "Sick!"\nHigher values mean you have to hit later.',
 			'ratingOffset',
 			'int',
@@ -93,7 +100,7 @@ class GameplaySettingsSubState extends BaseOptionsMenu
 		option.maxValue = 30;
 		addOption(option);
 
-		var option:Option = new Option('Sick! Hit Window',
+		var option:Option = new Option('Sick! Hit Window', //		Sick! Hit Window
 			'Changes the amount of time you have\nfor hitting a "Sick!" in milliseconds.',
 			'sickWindow',
 			'int',
@@ -104,7 +111,7 @@ class GameplaySettingsSubState extends BaseOptionsMenu
 		option.maxValue = 45;
 		addOption(option);
 
-		var option:Option = new Option('Good Hit Window',
+		var option:Option = new Option('Good Hit Window', //		Good Hit Window
 			'Changes the amount of time you have\nfor hitting a "Good" in milliseconds.',
 			'goodWindow',
 			'int',
@@ -115,7 +122,7 @@ class GameplaySettingsSubState extends BaseOptionsMenu
 		option.maxValue = 90;
 		addOption(option);
 
-		var option:Option = new Option('Bad Hit Window',
+		var option:Option = new Option('Bad Hit Window', //		Bad Hit Window
 			'Changes the amount of time you have\nfor hitting a "Bad" in milliseconds.',
 			'badWindow',
 			'int',
@@ -126,7 +133,7 @@ class GameplaySettingsSubState extends BaseOptionsMenu
 		option.maxValue = 135;
 		addOption(option);
 
-		var option:Option = new Option('Safe Frames',
+		var option:Option = new Option('Safe Frames', //		 Safe Frames
 			'Changes how many frames you have for\nhitting a note earlier or late.',
 			'safeFrames',
 			'float',

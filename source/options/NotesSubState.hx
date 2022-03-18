@@ -173,7 +173,9 @@ class NotesSubState extends MusicBeatSubstate
 
 		if (controls.BACK || (changingNote && controls.ACCEPT)) {
 			if(!changingNote) {
+				trace('before close');
 				close();
+				trace('after close probably');
 			} else {
 				changeSelection();
 			}

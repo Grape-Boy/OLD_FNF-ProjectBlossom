@@ -185,6 +185,9 @@ class PlayState extends MusicBeatState
 	public var camOther:FlxCamera;
 	public var cameraSpeed:Float = 1;
 
+	var camPanX:Int = 50;
+	var camPanY:Int = 50;
+
 	var dialogue:Array<String> = ['blah blah blah', 'coolswag'];
 	var dialogueJson:DialogueFile = null;
 
@@ -2179,6 +2182,69 @@ class PlayState extends MusicBeatState
 
 		callOnLuas('onUpdate', [elapsed]);
 
+		var curSection:Int = Math.floor(curStep / 16);
+
+		// amazing code down below in the description
+
+		if(curSection >= 0)
+		{
+			if(SONG.notes[curSection].mustHitSection)
+			{
+				var animName:String = boyfriend.animation.curAnim.name;
+
+				camFollow.set(boyfriend.getMidpoint().x - 100, boyfriend.getMidpoint().y - 100);
+
+				if(animName.startsWith('singLEFT') && !animName.endsWith('miss'))
+				{
+					camFollow.x -= boyfriend.cameraPosition[0] - boyfriendCameraOffset[0] + camPanX;
+					camFollow.y += boyfriend.cameraPosition[1] + boyfriendCameraOffset[1];
+				}
+				else if(animName.startsWith('singDOWN') && !animName.endsWith('miss'))
+				{
+					camFollow.x -= boyfriend.cameraPosition[0] - boyfriendCameraOffset[0];
+					camFollow.y += boyfriend.cameraPosition[1] + boyfriendCameraOffset[1] + camPanY;
+				}
+				else if(animName.startsWith('singUP') && !animName.endsWith('miss'))
+				{
+					camFollow.x -= boyfriend.cameraPosition[0] - boyfriendCameraOffset[0];
+					camFollow.y += boyfriend.cameraPosition[1] + boyfriendCameraOffset[1] - camPanY;
+				}
+				else if(animName.startsWith('singRIGHT') && !animName.endsWith('miss'))
+				{
+					camFollow.x -= boyfriend.cameraPosition[0] - boyfriendCameraOffset[0] - camPanX;
+					camFollow.y += boyfriend.cameraPosition[1] + boyfriendCameraOffset[1];
+				};
+			}
+			else
+			{
+				var animName:String = dad.animation.curAnim.name;
+
+				camFollow.set(dad.getMidpoint().x + 150, dad.getMidpoint().y - 100);
+
+				if(animName.startsWith('singLEFT'))
+				{
+					camFollow.x += dad.cameraPosition[0] - opponentCameraOffset[0] - camPanX;
+					camFollow.y += dad.cameraPosition[1] + opponentCameraOffset[1];
+				}
+				else if(animName.startsWith('singDOWN'))
+				{
+					camFollow.x += dad.cameraPosition[0] - opponentCameraOffset[0];
+					camFollow.y += dad.cameraPosition[1] + opponentCameraOffset[1] + camPanY;
+				}
+				else if(animName.startsWith('singUP'))
+				{
+					camFollow.x += dad.cameraPosition[0] - opponentCameraOffset[0];
+					camFollow.y += dad.cameraPosition[1] + opponentCameraOffset[1] - camPanY;
+				}
+				else if(animName.startsWith('singRIGHT'))
+				{
+					camFollow.x += dad.cameraPosition[0] - opponentCameraOffset[0] + camPanX;
+					camFollow.y += dad.cameraPosition[1] + opponentCameraOffset[1];
+				};
+			}
+		};
+		// if anyone knows to optimize this then please tell me!!
+
 		switch (curStage)
 		{
 			case 'schoolEvil':
@@ -3611,39 +3677,6 @@ class PlayState extends MusicBeatState
 				Conductor.songPosition = lastTime;
 			};
 
-			var curSection:Int = Math.floor(curStep / 16);
-			if(SONG.notes[curSection].mustHitSection)
-			{
-
-				var offsetX:Float = 20;
-				var offsetY:Float = 20;
-
-				var camX:Float = boyfriend.cameraPosition[0];
-				var camY:Float = boyfriend.cameraPosition[1];
-
-				var animName:String = boyfriend.animation.curAnim.name;
-				if(animName.startsWith('singLEFT') && !animName.endsWith('miss'))
-				{
-					camFollow.x = boyfriend.x + camX - offsetX;
-					camFollow.y = boyfriend.y + camY;
-				}
-				else if(animName.startsWith('singDOWN') && !animName.endsWith('miss'))
-				{
-					camFollow.x = boyfriend.x + camX;
-					camFollow.y = boyfriend.y + camY + offsetY;
-				}
-				else if(animName.startsWith('singUP') && !animName.endsWith('miss'))
-				{
-					camFollow.x = boyfriend.x + camX;
-					camFollow.y = boyfriend.y + camY - offsetY;
-				}
-				else if(animName.startsWith('singRIGHT') && !animName.endsWith('miss'))
-				{
-					camFollow.x = boyfriend.x + camX + offsetX;
-					camFollow.y = boyfriend.y + camY;
-				}
-			}
-
 			var spr:StrumNote = playerStrums.members[key];
 			if(spr != null && spr.animation.curAnim.name != 'confirm')
 			{
@@ -4486,7 +4519,7 @@ class PlayState extends MusicBeatState
 						if(isStoryMode && campaignMisses + songMisses < 1 && CoolUtil.difficultyString() == 'HARD' && storyPlaylist.length <= 1 && !changedDifficulty && !usedPractice)
 						{
 							var weekName:String = WeekData.getWeekFileName();
-							switch(weekName) //I know this is a lot of duplicated code, but it's easier readable and you can add weeks with different names than the achievement tag
+							switch(weekName) //I know this is a lot of duplicated code, but it's easier readable and you can add weeks with different names than the achievement tag // yes I vouch for this
 							{
 								case 'week1':
 									if(achievementName == 'week1_nomiss') unlock = true;
